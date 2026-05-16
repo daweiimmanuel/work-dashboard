@@ -1,0 +1,8 @@
+{
+  "version": 2,
+  "installCommand": "npm run install:api",
+  "buildCommand": "npm run build",
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/api/vercel/api.ts" }
+  ]
+}
