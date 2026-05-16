@@ -1,0 +1,11 @@
+{
+  "name": "work-dashboard",
+  "private": true,
+  "workspaces": [
+    "api"
+  ],
+  "scripts": {
+    "build": "npm --workspace api run build",
+    "typecheck": "npm --workspace api run typecheck"
+  }
+}
