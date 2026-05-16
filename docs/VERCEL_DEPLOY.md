@@ -1,37 +1,43 @@
 # Deploy API ke Vercel
 
-## Kenapa error `npm install exited with 254`
-Penyebab paling umum di setup ini: Vercel menjalankan install di root repository, sementara sebelumnya `package.json` hanya ada di folder `api/`.
+Dokumen ini sudah dirapikan untuk menghindari conflict antar versi PR (khususnya pada strategi deploy root-vs-api) dan menangani error umum `npm install exited with 254`.
 
-Perbaikan yang sudah diterapkan:
-- Menambahkan `package.json` di root (workspace ke `api`) supaya `npm install` di root sukses.
-- Menambahkan `vercel.json` di root agar Vercel punya install/build command yang eksplisit.
+## Kenapa error `npm install exited with 254`
+Kasus paling umum: Vercel menjalankan `npm install` dari root repository, tapi root belum punya `package.json`.
+
+Perbaikan di branch ini:
+- Root `package.json` ditambahkan dengan npm workspace ke `api`.
+- Root `vercel.json` ditambahkan dengan `installCommand` dan `buildCommand` eksplisit.
 
 ## Prasyarat
 - Akun Vercel
-- Project terhubung ke repository ini
-- Env var: `JWT_SECRET` (**wajib**) dan `NODE_ENV=production`
+- Repository terhubung ke Vercel Project
+- Environment variables:
+  - `JWT_SECRET` (**wajib**, tanpa ini login gagal)
+  - `NODE_ENV=production`
 
-## Opsi Deploy yang direkomendasikan
+## Opsi Deploy
 
-### Opsi A (recommended): Deploy dari root repo
-Gunakan setting default root (`/`) di Vercel.
+### Opsi A (direkomendasikan): deploy dari root repo
+Gunakan root directory default (`/`) di Vercel.
 - Install Command: `npm install`
 - Build Command: `npm run build`
 
-### Opsi B: Deploy dari folder `api`
-Jika ingin set Root Directory = `api`, itu juga valid.
+### Opsi B: deploy dari folder `api`
+Jika ingin set Root Directory = `api`, ini juga valid.
+Pastikan konfigurasi build command tetap konsisten dengan `api/package.json`.
 
-## Endpoint
+## Endpoint API
 - `GET /health`
 - `POST /auth/signup`
 - `POST /auth/login`
 - `POST /auth/otp/verify`
 
-## Verifikasi cepat
+## Verifikasi cepat setelah deploy
 ```bash
 curl -s https://<your-vercel-domain>/health
 ```
 
-## Catatan
-- Storage saat ini masih in-memory (non-persistent), belum suitable untuk production multi-instance/serverless.
+## Catatan penting
+- Storage saat ini masih in-memory, sehingga data tidak persisten antar serverless invocation.
+- Sebelum production: migrasi ke PostgreSQL + Redis (OTP/session throttle + rate limiting).
